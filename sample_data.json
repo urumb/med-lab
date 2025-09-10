@@ -1,0 +1,98 @@
+[
+    {
+        "model": "booking.test",
+        "pk": 1,
+        "fields": {
+            "test_name": "Blood Sugar Test",
+            "description": "Fasting blood glucose test to check diabetes. This test measures the amount of glucose in your blood after fasting for at least 8 hours. It helps in diagnosing diabetes and monitoring blood sugar levels.",
+            "price": "25.00",
+            "duration_hours": 1,
+            "is_active": true,
+            "created_at": "2025-08-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "booking.test",
+        "pk": 2,
+        "fields": {
+            "test_name": "Complete Blood Count (CBC)",
+            "description": "Comprehensive blood test to check overall health. This test evaluates your overall health and detect various disorders, including anemia, infection and leukemia. It measures red blood cells, white blood cells, and platelets.",
+            "price": "45.00",
+            "duration_hours": 1,
+            "is_active": true,
+            "created_at": "2025-08-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "booking.test",
+        "pk": 3,
+        "fields": {
+            "test_name": "Lipid Profile",
+            "description": "Cholesterol and triglycerides test to assess cardiovascular risk. This test measures different types of cholesterol and triglycerides in your blood to evaluate your risk of heart disease.",
+            "price": "35.00",
+            "duration_hours": 1,
+            "is_active": true,
+            "created_at": "2025-08-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "booking.test",
+        "pk": 4,
+        "fields": {
+            "test_name": "Thyroid Function Test",
+            "description": "TSH, T3, T4 levels to assess thyroid function. This test evaluates how well your thyroid gland is working by measuring thyroid hormones and thyroid stimulating hormone levels.",
+            "price": "55.00",
+            "duration_hours": 2,
+            "is_active": true,
+            "created_at": "2025-08-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "booking.test",
+        "pk": 5,
+        "fields": {
+            "test_name": "Liver Function Test",
+            "description": "Tests to check liver health and function. This group of blood tests checks how well your liver is working by measuring enzymes, proteins and other substances produced by the liver.",
+            "price": "40.00",
+            "duration_hours": 1,
+            "is_active": true,
+            "created_at": "2025-08-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "booking.test",
+        "pk": 6,
+        "fields": {
+            "test_name": "Kidney Function Test",
+            "description": "Blood and urine tests to evaluate kidney function. These tests measure waste products, electrolytes, and other substances to determine how well your kidneys are filtering blood.",
+            "price": "50.00",
+            "duration_hours": 1,
+            "is_active": true,
+            "created_at": "2025-08-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "booking.test",
+        "pk": 7,
+        "fields": {
+            "test_name": "Vitamin D Test",
+            "description": "Blood test to measure vitamin D levels. This test checks if you have enough vitamin D in your blood, which is important for bone health and immune function.",
+            "price": "30.00",
+            "duration_hours": 1,
+            "is_active": true,
+            "created_at": "2025-08-01T10:00:00Z"
+        }
+    },
+    {
+        "model": "booking.test",
+        "pk": 8,
+        "fields": {
+            "test_name": "HbA1c Test",
+            "description": "Glycated hemoglobin test for diabetes monitoring. This test shows your average blood sugar levels over the past 2-3 months and is used to diagnose and monitor diabetes.",
+            "price": "35.00",
+            "duration_hours": 1,
+            "is_active": true,
+            "created_at": "2025-08-01T10:00:00Z"
+        }
+    }
+]

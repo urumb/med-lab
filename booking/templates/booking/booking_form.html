@@ -1,0 +1,353 @@
+{% extends 'booking/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-calendar-plus me-2"></i>Book Medical Test
+                    </h3>
+                    {% if selected_test %}
+                        <p class="mb-0 mt-2">
+                            <small>Selected Test: <strong>{{ selected_test.test_name }}</strong> - ₹{{ selected_test.price }}</small>
+                        </p>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <form method="post" id="bookingForm" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Patient Information Section -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-user me-2 text-primary"></i>Patient Information
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    <label for="{{ form.patient_name.id_for_label }}" class="form-label">
+                                        {{ form.patient_name.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.patient_name }}
+                                    <div class="invalid-feedback">
+                                        Please provide a valid name.
+                                    </div>
+                                    {% if form.patient_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.patient_name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.patient_age.id_for_label }}" class="form-label">
+                                        {{ form.patient_age.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.patient_age }}
+                                    <div class="invalid-feedback">
+                                        Please provide a valid age.
+                                    </div>
+                                    {% if form.patient_age.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.patient_age.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.patient_gender.id_for_label }}" class="form-label">
+                                        {{ form.patient_gender.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.patient_gender }}
+                                    <div class="invalid-feedback">
+                                        Please select a gender.
+                                    </div>
+                                    {% if form.patient_gender.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.patient_gender.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.patient_phone.id_for_label }}" class="form-label">
+                                        {{ form.patient_phone.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.patient_phone }}
+                                    <div class="invalid-feedback">
+                                        Please provide a valid phone number.
+                                    </div>
+                                    {% if form.patient_phone.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.patient_phone.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.patient_email.id_for_label }}" class="form-label">
+                                        {{ form.patient_email.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.patient_email }}
+                                    <div class="invalid-feedback">
+                                        Please provide a valid email address.
+                                    </div>
+                                    {% if form.patient_email.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.patient_email.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.patient_address.id_for_label }}" class="form-label">
+                                    {{ form.patient_address.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.patient_address }}
+                                <div class="invalid-feedback">
+                                    Please provide a valid address.
+                                </div>
+                                {% if form.patient_address.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.patient_address.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Booking Information Section -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-calendar-alt me-2 text-primary"></i>Booking Information
+                            </h5>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.test.id_for_label }}" class="form-label">
+                                        {{ form.test.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.test }}
+                                    <div class="invalid-feedback">
+                                        Please select a test.
+                                    </div>
+                                    {% if form.test.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.test.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div id="testInfo" class="mt-2 p-2 bg-light rounded d-none">
+                                        <small class="text-muted">
+                                            <strong>Price:</strong> <span id="testPrice">-</span><br>
+                                            <strong>Duration:</strong> <span id="testDuration">-</span>
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="{{ form.booking_date.id_for_label }}" class="form-label">
+                                        {{ form.booking_date.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.booking_date }}
+                                    <div class="invalid-feedback">
+                                        Please select a valid date.
+                                    </div>
+                                    {% if form.booking_date.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.booking_date.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">{{ form.booking_date.help_text }}</div>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="{{ form.booking_time.id_for_label }}" class="form-label">
+                                        {{ form.booking_time.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.booking_time }}
+                                    <div class="invalid-feedback">
+                                        Please select a valid time.
+                                    </div>
+                                    {% if form.booking_time.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.booking_time.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">{{ form.booking_time.help_text }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Time Availability Check -->
+                            <div id="availabilityCheck" class="mb-3 d-none">
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span id="availabilityMessage">Checking availability...</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                    {{ form.notes.label }}
+                                </label>
+                                {{ form.notes }}
+                                {% if form.notes.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.notes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'booking:home' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Tests
+                            </a>
+
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-check me-2"></i>Confirm Booking
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('bookingForm');
+    const testSelect = document.getElementById('id_test');
+    const dateInput = document.getElementById('id_booking_date');
+    const timeInput = document.getElementById('id_booking_time');
+    const testInfo = document.getElementById('testInfo');
+    const availabilityCheck = document.getElementById('availabilityCheck');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Test selection handler
+    if (testSelect) {
+        testSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                // Show test info (you would normally get this from an API)
+                testInfo.classList.remove('d-none');
+                document.getElementById('testPrice').textContent = 'Loading...';
+                document.getElementById('testDuration').textContent = 'Loading...';
+
+                // In a real implementation, you would make an AJAX call here
+                setTimeout(() => {
+                    document.getElementById('testPrice').textContent = '₹' + (Math.floor(Math.random() * 100) + 20);
+                    document.getElementById('testDuration').textContent = Math.floor(Math.random() * 3) + 1 + ' hour(s)';
+                }, 500);
+            } else {
+                testInfo.classList.add('d-none');
+            }
+            checkAvailability();
+        });
+    }
+
+    // Date and time change handlers
+    [dateInput, timeInput].forEach(input => {
+        if (input) {
+            input.addEventListener('change', checkAvailability);
+        }
+    });
+
+    // Check availability function
+    function checkAvailability() {
+        const test = testSelect ? testSelect.value : null;
+        const date = dateInput ? dateInput.value : null;
+        const time = timeInput ? timeInput.value : null;
+
+        if (test && date && time) {
+            availabilityCheck.classList.remove('d-none');
+            document.getElementById('availabilityMessage').textContent = 'Checking availability...';
+
+            // Simulate availability check
+            setTimeout(() => {
+                const isAvailable = Math.random() > 0.2; // 80% chance of availability
+                const message = availabilityCheck.querySelector('.alert');
+
+                if (isAvailable) {
+                    message.className = 'alert alert-success mb-0';
+                    document.getElementById('availabilityMessage').innerHTML = 
+                        '<i class="fas fa-check-circle me-2"></i>Time slot is available!';
+                    submitBtn.disabled = false;
+                } else {
+                    message.className = 'alert alert-warning mb-0';
+                    document.getElementById('availabilityMessage').innerHTML = 
+                        '<i class="fas fa-exclamation-triangle me-2"></i>This time slot is already booked. Please choose a different time.';
+                    submitBtn.disabled = true;
+                }
+            }, 1000);
+        } else {
+            availabilityCheck.classList.add('d-none');
+            submitBtn.disabled = false;
+        }
+    }
+
+    // Form validation
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Phone number formatting
+    const phoneInput = document.getElementById('id_patient_phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            if (value.length > 6) {
+                value = value.substring(0, 6) + '-' + value.substring(6);
+            }
+            if (value.length > 3 && value.length <= 6) {
+                value = value.substring(0, 3) + '-' + value.substring(3);
+            }
+            e.target.value = value;
+        });
+    }
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.was-validated .form-control:valid {
+    border-color: #28a745;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.4-.12a.75.75 0 0 1 .38.07l.94.48a.75.75 0 0 0 .88-.1l2.57-2.12a.75.75 0 0 1 .78-.06l.26.13a.75.75 0 0 1 .28.97l-.34.67a.75.75 0 0 1-.1.15l-4.13 3.86a.75.75 0 0 1-1.08.04L1.1 7.47a.75.75 0 0 1 .01-1.06l1.19-1.16z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.was-validated .form-control:invalid {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+</style>
+{% endblock %}

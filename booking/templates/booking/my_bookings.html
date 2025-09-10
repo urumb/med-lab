@@ -1,0 +1,243 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-list me-2 text-primary"></i>My Bookings
+            </h2>
+        </div>
+    </div>
+
+    {% if not patient %}
+        <!-- Search Form -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-6">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-search me-2"></i>Find Your Bookings
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            Enter your email address or phone number to view your bookings.
+                        </p>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       placeholder="your.email@example.com">
+                            </div>
+
+                            <div class="text-center mb-3">
+                                <small class="text-muted">OR</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       placeholder="+91 XXXXXXXXXX">
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Search Bookings
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if patient and bookings %}
+        <!-- Patient Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-user me-2"></i>Patient: {{ patient.name }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <p><strong>Age:</strong> {{ patient.age }} years</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Gender:</strong> {{ patient.get_gender_display }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Phone:</strong> {{ patient.phone }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>Email:</strong> {{ patient.email }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings List -->
+        <div class="row">
+            {% for booking in bookings %}
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 {% if booking.is_upcoming %}border-primary{% endif %}">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">
+                                <i class="fas fa-flask me-2"></i>{{ booking.test.test_name }}
+                            </h6>
+                            <span class="badge {% if booking.status == 'pending' %}bg-warning{% elif booking.status == 'confirmed' %}bg-success{% elif booking.status == 'completed' %}bg-info{% else %}bg-danger{% endif %}">
+                                {{ booking.get_status_display }}
+                            </span>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <p class="mb-1"><strong>Date:</strong></p>
+                                    <p class="text-muted">{{ booking.booking_date|date:"F d, Y" }}</p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="mb-1"><strong>Time:</strong></p>
+                                    <p class="text-muted">{{ booking.booking_time|time:"g:i A" }}</p>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <p class="mb-1"><strong>Booking ID:</strong></p>
+                                    <p class="text-muted">BK-{{ booking.id|stringformat:"04d" }}</p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="mb-1"><strong>Cost:</strong></p>
+                                    <p class="text-muted">₹{{ booking.total_cost }}</p>
+                                </div>
+                            </div>
+
+                            {% if booking.notes %}
+                                <div class="mb-3">
+                                    <p class="mb-1"><strong>Notes:</strong></p>
+                                    <p class="text-muted small">{{ booking.notes|truncatewords:20 }}</p>
+                                </div>
+                            {% endif %}
+
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Booked on {{ booking.created_at|date:"M d, Y" }} at {{ booking.created_at|time:"g:i A" }}
+                                </small>
+                            </div>
+
+                            {% if booking.is_upcoming %}
+                                <div class="alert alert-info py-2 mb-0">
+                                    <small>
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        This is an upcoming appointment
+                                    </small>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-footer bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    Duration: {{ booking.test.duration_hours }} hour{{ booking.test.duration_hours|pluralize }}
+                                </small>
+
+                                {% if booking.status == 'pending' and booking.is_upcoming %}
+                                    <a href="tel:+911234567890" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-phone me-1"></i>Call to Modify
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Summary Card -->
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Booking Summary
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h4 class="text-primary">{{ bookings|length }}</h4>
+                        <p class="text-muted small mb-0">Total Bookings</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="text-warning">{{ bookings|dictsort:"status"|dictsort:"pending"|length }}</h4>
+                        <p class="text-muted small mb-0">Pending</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="text-success">{{ bookings|dictsort:"status"|dictsort:"confirmed"|length }}</h4>
+                        <p class="text-muted small mb-0">Confirmed</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="text-info">{{ bookings|dictsort:"status"|dictsort:"completed"|length }}</h4>
+                        <p class="text-muted small mb-0">Completed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center mt-4">
+            <a href="{% url 'booking:book_test' %}" class="btn btn-primary me-3">
+                <i class="fas fa-plus me-2"></i>Book Another Test
+            </a>
+            <a href="{% url 'booking:home' %}" class="btn btn-outline-primary">
+                <i class="fas fa-home me-2"></i>Back to Home
+            </a>
+        </div>
+
+    {% elif patient and not bookings %}
+        <!-- No Bookings Found -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-calendar-times display-1 text-muted"></i>
+            </div>
+            <h3 class="text-muted">No Bookings Found</h3>
+            <p class="text-muted">{{ patient.name }}, you don't have any bookings yet.</p>
+            <a href="{% url 'booking:book_test' %}" class="btn btn-primary">
+                <i class="fas fa-calendar-plus me-2"></i>Book Your First Test
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus on email input
+    const emailInput = document.getElementById('email');
+    if (emailInput) {
+        emailInput.focus();
+    }
+
+    // Form validation
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!email && !phone) {
+                e.preventDefault();
+                alert('Please enter either email address or phone number.');
+                return false;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

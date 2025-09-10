@@ -1,0 +1,243 @@
+{% extends 'booking/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Professional Medical Testing</h1>
+                <p class="lead mb-4">
+                    Book your lab tests quickly and easily. We offer a wide range of medical tests 
+                    with accurate results and professional service.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'booking:book_test' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-calendar-plus me-2"></i>Book Now
+                    </a>
+                    <a href="{% url 'booking:my_bookings' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-search me-2"></i>Track Booking
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <i class="fas fa-heartbeat display-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="py-4 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-flask text-primary fs-1 mb-2"></i>
+                    <h4>{{ total_tests }}</h4>
+                    <p class="text-muted mb-0">Available Tests</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-clock text-success fs-1 mb-2"></i>
+                    <h4>8-20</h4>
+                    <p class="text-muted mb-0">Working Hours</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-calendar-check text-info fs-1 mb-2"></i>
+                    <h4>7 Days</h4>
+                    <p class="text-muted mb-0">Open Weekly</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3">
+                    <i class="fas fa-award text-warning fs-1 mb-2"></i>
+                    <h4>24-48hrs</h4>
+                    <p class="text-muted mb-0">Report Time</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Available Tests Section -->
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-flask text-primary me-2"></i>Available Medical Tests</h2>
+                <a href="{% url 'booking:book_test' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Book a Test
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if tests %}
+        <div class="row">
+            {% for test in tests %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm hover-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title text-primary mb-0">{{ test.test_name }}</h5>
+                                <span class="badge bg-primary">₹{{ test.price }}</span>
+                            </div>
+
+                            <p class="card-text text-muted">{{ test.description|truncatewords:20 }}</p>
+
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>Duration: {{ test.duration_hours }} hour{{ test.duration_hours|pluralize }}
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white border-0">
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'booking:test_detail' test.id %}" class="btn btn-outline-primary btn-sm flex-fill">
+                                    <i class="fas fa-info-circle me-1"></i>Details
+                                </a>
+                                <a href="{% url 'booking:book_specific_test' test.id %}" class="btn btn-primary btn-sm flex-fill">
+                                    <i class="fas fa-calendar-plus me-1"></i>Book Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-flask-vial display-1 text-muted"></i>
+            </div>
+            <h3 class="text-muted">No Tests Available</h3>
+            <p class="text-muted">Currently, no medical tests are available for booking. Please check back later.</p>
+            <a href="{% url 'booking:contact' %}" class="btn btn-primary">
+                <i class="fas fa-phone me-2"></i>Contact Us
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Features Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2>Why Choose Our Lab?</h2>
+            <p class="text-muted">Professional healthcare services with modern equipment and experienced staff</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="text-center p-4">
+                    <div class="bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-microscope fs-3"></i>
+                    </div>
+                    <h5>Advanced Equipment</h5>
+                    <p class="text-muted">State-of-the-art medical equipment for accurate and reliable test results.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="text-center p-4">
+                    <div class="bg-success text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-user-md fs-3"></i>
+                    </div>
+                    <h5>Expert Staff</h5>
+                    <p class="text-muted">Experienced and certified medical professionals ensuring quality service.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="text-center p-4">
+                    <div class="bg-info text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-clock fs-3"></i>
+                    </div>
+                    <h5>Quick Results</h5>
+                    <p class="text-muted">Fast processing and timely delivery of your medical test reports.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2>How It Works</h2>
+        <p class="text-muted">Simple steps to book your medical test</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="text-center">
+                <div class="bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">1</span>
+                </div>
+                <h6>Choose Test</h6>
+                <p class="text-muted small">Select the medical test you need from our available options.</p>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="text-center">
+                <div class="bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">2</span>
+                </div>
+                <h6>Book Appointment</h6>
+                <p class="text-muted small">Fill out the booking form with your details and preferred time.</p>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="text-center">
+                <div class="bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">3</span>
+                </div>
+                <h6>Visit Lab</h6>
+                <p class="text-muted small">Come to our lab at the scheduled time for your test.</p>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="text-center">
+                <div class="bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">4</span>
+                </div>
+                <h6>Get Results</h6>
+                <p class="text-muted small">Receive your test results within 24-48 hours.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'booking:book_test' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-calendar-plus me-2"></i>Start Booking Now
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.hover-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+}
+
+.display-1 {
+    font-size: 6rem;
+}
+</style>
+{% endblock %}

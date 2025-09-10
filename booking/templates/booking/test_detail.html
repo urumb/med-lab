@@ -1,0 +1,90 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Test Details Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-flask me-2"></i>{{ test.test_name }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <h5 class="text-muted mb-3">Description</h5>
+                            <p class="lead">{{ test.description }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-light p-3 rounded">
+                                <h6 class="text-primary mb-3">Test Information</h6>
+                                <p class="mb-2"><strong>Price:</strong> <span class="text-success">₹{{ test.price }}</span></p>
+                                <p class="mb-2"><strong>Duration:</strong> {{ test.duration_hours }} hour{{ test.duration_hours|pluralize }}</p>
+                                <p class="mb-0"><strong>Status:</strong> 
+                                    <span class="badge bg-success">Available</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <a href="{% url 'booking:book_specific_test' test.id %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-calendar-plus me-2"></i>Book This Test
+                        </a>
+                        <a href="{% url 'booking:home' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to All Tests
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Quick Book Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Quick Book
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-calendar-check text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-muted">Ready to book this test?</p>
+                    <a href="{% url 'booking:book_specific_test' test.id %}" class="btn btn-primary btn-block">
+                        Book Now - ₹{{ test.price }}
+                    </a>
+                </div>
+            </div>
+
+            <!-- Lab Hours Card -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Lab Hours
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="d-flex justify-content-between py-1">
+                            <span>Monday - Friday</span>
+                            <span>8:00 AM - 8:00 PM</span>
+                        </li>
+                        <li class="d-flex justify-content-between py-1">
+                            <span>Saturday</span>
+                            <span>8:00 AM - 6:00 PM</span>
+                        </li>
+                        <li class="d-flex justify-content-between py-1">
+                            <span>Sunday</span>
+                            <span>9:00 AM - 5:00 PM</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

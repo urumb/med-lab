@@ -1,0 +1,57 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="text-center mb-5">About Our Medical Lab</h1>
+
+            <div class="card shadow mb-4">
+                <div class="card-body p-4">
+                    <h3 class="text-primary mb-3">Our Mission</h3>
+                    <p class="lead">
+                        We are dedicated to providing accurate, reliable, and timely medical testing services 
+                        to help patients and healthcare providers make informed decisions about health and wellness.
+                    </p>
+
+                    <h3 class="text-primary mb-3 mt-4">Our Services</h3>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Comprehensive blood tests</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Hormone level testing</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Vitamin and mineral analysis</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Diabetes monitoring</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Heart health assessments</li>
+                    </ul>
+
+                    <h3 class="text-primary mb-3 mt-4">Why Choose Us?</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-star text-warning me-2"></i>State-of-the-art equipment</li>
+                                <li class="mb-2"><i class="fas fa-star text-warning me-2"></i>Certified professionals</li>
+                                <li class="mb-2"><i class="fas fa-star text-warning me-2"></i>Quick results</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><i class="fas fa-star text-warning me-2"></i>Affordable pricing</li>
+                                <li class="mb-2"><i class="fas fa-star text-warning me-2"></i>Convenient booking</li>
+                                <li class="mb-2"><i class="fas fa-star text-warning me-2"></i>7 days a week service</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <a href="{% url 'booking:book_test' %}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-calendar-plus me-2"></i>Book a Test
+                </a>
+                <a href="{% url 'booking:contact' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-phone me-2"></i>Contact Us
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

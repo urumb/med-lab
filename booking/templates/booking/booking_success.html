@@ -1,0 +1,137 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white text-center">
+                    <h3 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>Booking Confirmed!
+                    </h3>
+                </div>
+
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="success-icon mb-3">
+                            <i class="fas fa-calendar-check text-success" style="font-size: 4rem;"></i>
+                        </div>
+                        <h4 class="text-success">Your test has been booked successfully!</h4>
+                        <p class="text-muted">You will receive a confirmation call from our team shortly.</p>
+                    </div>
+
+                    <!-- Booking Details -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Booking Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Booking ID:</strong> BK-{{ booking.id|stringformat:"04d" }}</p>
+                                    <p><strong>Patient Name:</strong> {{ booking.patient.name }}</p>
+                                    <p><strong>Test Name:</strong> {{ booking.test.test_name }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Date:</strong> {{ booking.booking_date|date:"F d, Y" }}</p>
+                                    <p><strong>Time:</strong> {{ booking.booking_time|time:"g:i A" }}</p>
+                                    <p><strong>Total Cost:</strong> ₹{{ booking.total_cost }}</p>
+                                </div>
+                            </div>
+                            {% if booking.notes %}
+                                <div class="mt-3">
+                                    <p><strong>Notes:</strong></p>
+                                    <p class="text-muted">{{ booking.notes }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Patient Information -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-user me-2"></i>Patient Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Age:</strong> {{ booking.patient.age }} years</p>
+                                    <p><strong>Gender:</strong> {{ booking.patient.get_gender_display }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Phone:</strong> {{ booking.patient.phone }}</p>
+                                    <p><strong>Email:</strong> {{ booking.patient.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Important Instructions -->
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-exclamation-circle me-2"></i>Important Instructions</h5>
+                        <ul class="mb-0">
+                            <li>Please arrive 15 minutes before your scheduled time</li>
+                            <li>Bring a valid photo ID for verification</li>
+                            <li>Follow any specific preparation instructions for your test</li>
+                            <li>If you need to reschedule, please contact us at least 4 hours in advance</li>
+                        </ul>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fas fa-phone me-2"></i>Contact Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <p><i class="fas fa-phone text-primary me-2"></i><strong>Phone:</strong><br>+91 1234567890</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p><i class="fas fa-envelope text-primary me-2"></i><strong>Email:</strong><br>info@medicallab.com</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p><i class="fas fa-clock text-primary me-2"></i><strong>Hours:</strong><br>8:00 AM - 8:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center">
+                        <a href="{% url 'booking:home' %}" class="btn btn-primary me-3">
+                            <i class="fas fa-home me-2"></i>Back to Home
+                        </a>
+                        <a href="{% url 'booking:book_test' %}" class="btn btn-outline-primary me-3">
+                            <i class="fas fa-plus me-2"></i>Book Another Test
+                        </a>
+                        <a href="{% url 'booking:my_bookings' %}" class="btn btn-outline-success">
+                            <i class="fas fa-list me-2"></i>View All Bookings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.success-icon {
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-20px);
+    }
+    60% {
+        transform: translateY(-10px);
+    }
+}
+</style>
+{% endblock %}
