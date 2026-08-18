@@ -1,0 +1,103 @@
+{% extends "booking/base.html" %}
+
+{% block title %}Patient Dashboard - MedLab Diagnostics{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Banner -->
+    <div class="bg-primary text-white p-4 rounded-3 shadow-sm mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h3 class="fw-bold mb-1">Welcome back, {{ patient.name }}!</h3>
+            <p class="mb-0 text-white-50"><i class="bi bi-envelope me-1"></i>{{ patient.email }} | <i class="bi bi-telephone me-1"></i>{{ patient.phone }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'booking:patient_profile' %}" class="btn btn-light text-primary fw-semibold btn-sm">
+                <i class="bi bi-person-gear me-1"></i> Edit Profile
+            </a>
+            <a href="{% url 'booking:book_test' %}" class="btn btn-warning text-dark fw-bold btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Book New Test
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Upcoming Bookings -->
+        <div class="col-lg-8">
+            <div class="card card-custom p-4 shadow-sm mb-4">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar-event me-2 text-primary"></i>Upcoming Appointments</h5>
+
+                {% if upcoming_bookings %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>REF CODE</th>
+                                <th>TEST NAME</th>
+                                <th>SCHEDULE</th>
+                                <th>STATUS</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in upcoming_bookings %}
+                            <tr>
+                                <td class="font-monospace fw-bold text-primary">{{ b.reference_number }}</td>
+                                <td><strong>{{ b.test.test_name }}</strong></td>
+                                <td class="small">{{ b.booking_date }}<br><span class="text-muted">{{ b.booking_time|time:"h:i A" }}</span></td>
+                                <td><span class="badge {{ b.get_status_badge_class }}">{{ b.get_status_display }}</span></td>
+                                <td>
+                                    <a href="{% url 'booking:booking_detail' b.reference_number %}" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted bg-light rounded">
+                    <i class="bi bi-calendar-x fs-2 d-block mb-2 text-secondary"></i>
+                    <p class="mb-2">No upcoming lab appointments scheduled.</p>
+                    <a href="{% url 'booking:book_test' %}" class="btn btn-primary btn-sm fw-semibold">Book a Diagnostic Test</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Booking History -->
+            <div class="card card-custom p-4 shadow-sm">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-clock-history me-2 text-primary"></i>Recent Booking History</h5>
+
+                {% if recent_bookings %}
+                <div class="list-group list-group-flush">
+                    {% for b in recent_bookings %}
+                    <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="font-monospace text-primary fw-bold small me-2">{{ b.reference_number }}</span>
+                            <span class="fw-bold text-dark">{{ b.test.test_name }}</span>
+                            <div class="small text-muted">{{ b.booking_date }} at {{ b.booking_time|time:"h:i A" }} &bull; ₹{{ b.total_cost }}</div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge {{ b.get_status_badge_class }}">{{ b.get_status_display }}</span>
+                            <a href="{% url 'booking:booking_detail' b.reference_number %}" class="btn btn-sm btn-light border">Details</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0 small">No previous booking history found.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar Summary -->
+        <div class="col-lg-4">
+            <div class="card card-custom p-4 shadow-sm mb-4">
+                <h6 class="fw-bold text-dark mb-3">Patient Profile Summary</h6>
+                <div class="small text-muted mb-2"><strong class="text-dark">Age / Gender:</strong> {{ patient.age }} Yrs / {{ patient.get_gender_display }}</div>
+                <div class="small text-muted mb-2"><strong class="text-dark">Address:</strong> {{ patient.address }}</div>
+                <div class="small text-muted mb-3"><strong class="text-dark">Total Bookings:</strong> {{ total_bookings_count }}</div>
+                <a href="{% url 'booking:patient_profile' %}" class="btn btn-outline-primary btn-sm w-100">Update Profile Info</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
