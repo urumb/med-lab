@@ -1,87 +1,99 @@
-{% extends 'booking/base.html' %}
+{% extends "booking/base.html" %}
+
+{% block title %}{{ test.test_name }} - Test Details & Guidelines{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row">
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'booking:home' %}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'booking:test_catalog' %}" class="text-decoration-none">Test Catalog</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ test.test_name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Main Details -->
         <div class="col-lg-8">
-            <!-- Test Details Card -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">
-                        <i class="fas fa-flask me-2"></i>{{ test.test_name }}
-                    </h3>
+            <div class="card card-custom p-4 shadow-sm mb-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill mb-2">
+                            {{ test.category.name|default:"Diagnostic Test" }}
+                        </span>
+                        <h2 class="fw-bold text-dark mb-1">{{ test.test_name }}</h2>
+                        {% if test.code %}
+                        <p class="text-muted small"><i class="bi bi-barcode me-1"></i> Test Code: <strong>{{ test.code }}</strong></p>
+                        {% endif %}
+                    </div>
+                    <div class="text-end">
+                        <span class="fs-2 fw-bold text-success">₹{{ test.price }}</span>
+                        <p class="small text-muted mb-0">Inclusive of all taxes</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-md-8">
-                            <h5 class="text-muted mb-3">Description</h5>
-                            <p class="lead">{{ test.description }}</p>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="bg-light p-3 rounded">
-                                <h6 class="text-primary mb-3">Test Information</h6>
-                                <p class="mb-2"><strong>Price:</strong> <span class="text-success">₹{{ test.price }}</span></p>
-                                <p class="mb-2"><strong>Duration:</strong> {{ test.duration_hours }} hour{{ test.duration_hours|pluralize }}</p>
-                                <p class="mb-0"><strong>Status:</strong> 
-                                    <span class="badge bg-success">Available</span>
-                                </p>
+
+                <hr class="my-3">
+
+                <h5 class="fw-bold text-dark mb-2"><i class="bi bi-card-text me-2 text-primary"></i>Test Overview & Purpose</h5>
+                <p class="text-secondary leading-relaxed mb-4">{{ test.description }}</p>
+
+                <h5 class="fw-bold text-dark mb-2"><i class="bi bi-exclamation-triangle me-2 text-warning"></i>Patient Preparation Guidelines</h5>
+                <div class="bg-light p-3 rounded-3 mb-4 border border-secondary-subtle">
+                    <p class="text-dark mb-0">{{ test.preparation_instructions }}</p>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 bg-white">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi bi-clock-history fs-3 text-primary"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-0">Turnaround Time</h6>
+                                    <small class="text-muted">Results ready in ~{{ test.turnaround_time }}</small>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="d-flex gap-3">
-                        <a href="{% url 'booking:book_specific_test' test.id %}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-calendar-plus me-2"></i>Book This Test
-                        </a>
-                        <a href="{% url 'booking:home' %}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Back to All Tests
-                        </a>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 bg-white">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi bi-calendar2-check fs-3 text-primary"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-0">Procedure Duration</h6>
+                                    <small class="text-muted">Takes approx. {{ test.duration_hours }} Hour(s)</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Sticky Booking Box -->
         <div class="col-lg-4">
-            <!-- Quick Book Card -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">
-                        <i class="fas fa-clock me-2"></i>Quick Book
-                    </h5>
-                </div>
-                <div class="card-body text-center">
-                    <div class="mb-3">
-                        <i class="fas fa-calendar-check text-primary" style="font-size: 3rem;"></i>
-                    </div>
-                    <p class="text-muted">Ready to book this test?</p>
-                    <a href="{% url 'booking:book_specific_test' test.id %}" class="btn btn-primary btn-block">
-                        Book Now - ₹{{ test.price }}
-                    </a>
-                </div>
-            </div>
+            <div class="card card-custom p-4 shadow-sm sticky-top" style="top: 90px;">
+                <h5 class="fw-bold text-dark mb-3">Schedule Appointment</h5>
+                <p class="small text-muted mb-3">Select your preferred date & time slot for this test.</p>
 
-            <!-- Lab Hours Card -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">
-                        <i class="fas fa-clock me-2"></i>Lab Hours
-                    </h5>
+                <div class="bg-light p-3 rounded mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Test Fee:</span>
+                        <span class="fw-bold">₹{{ test.price }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Home Sample Visit:</span>
+                        <span class="text-success fw-bold">FREE</span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <ul class="list-unstyled mb-0">
-                        <li class="d-flex justify-content-between py-1">
-                            <span>Monday - Friday</span>
-                            <span>8:00 AM - 8:00 PM</span>
-                        </li>
-                        <li class="d-flex justify-content-between py-1">
-                            <span>Saturday</span>
-                            <span>8:00 AM - 6:00 PM</span>
-                        </li>
-                        <li class="d-flex justify-content-between py-1">
-                            <span>Sunday</span>
-                            <span>9:00 AM - 5:00 PM</span>
-                        </li>
-                    </ul>
+
+                <a href="{% url 'booking:book_specific_test' test.id %}" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm mb-2">
+                    <i class="bi bi-calendar-plus me-1"></i> Proceed to Booking
+                </a>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted d-block mb-1"><i class="bi bi-shield-check text-success me-1"></i> Certified Lab Specialists</small>
+                    <small class="text-muted d-block"><i class="bi bi-lock text-success me-1"></i> Secure Digital Health Records</small>
                 </div>
             </div>
         </div>

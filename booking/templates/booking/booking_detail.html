@@ -1,0 +1,94 @@
+{% extends "booking/base.html" %}
+
+{% block title %}Booking Details - {{ booking.reference_number }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card card-custom p-4 p-md-5 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-3 flex-wrap gap-2">
+                    <div>
+                        <span class="text-muted small fw-semibold">BOOKING REFERENCE</span>
+                        <h3 class="fw-bold text-primary font-monospace mb-0">{{ booking.reference_number }}</h3>
+                    </div>
+                    <div>
+                        <span class="badge {{ booking.get_status_badge_class }} fs-6 px-3 py-2">{{ booking.get_status_display }}</span>
+                    </div>
+                </div>
+
+                <!-- Status Progress Indicator -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-3">Diagnostic Status Progression</h6>
+                    <div class="progress" style="height: 10px;">
+                        {% if booking.status == 'pending' %}
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 20%"></div>
+                        {% elif booking.status == 'confirmed' %}
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 40%"></div>
+                        {% elif booking.status == 'sample_collected' %}
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 60%"></div>
+                        {% elif booking.status == 'processing' %}
+                            <div class="progress-bar bg-purple" role="progressbar" style="width: 80%"></div>
+                        {% elif booking.status == 'completed' %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                        {% elif booking.status == 'cancelled' %}
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 100%"></div>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between text-muted small mt-2">
+                        <span class="{% if booking.status == 'pending' %}fw-bold text-warning{% endif %}">Pending</span>
+                        <span class="{% if booking.status == 'confirmed' %}fw-bold text-info{% endif %}">Confirmed</span>
+                        <span class="{% if booking.status == 'sample_collected' %}fw-bold text-primary{% endif %}">Sample Collected</span>
+                        <span class="{% if booking.status == 'processing' %}fw-bold text-purple{% endif %}">Processing</span>
+                        <span class="{% if booking.status == 'completed' %}fw-bold text-success{% endif %}">Completed</span>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="bg-light p-3 rounded border h-100">
+                            <h6 class="fw-bold text-dark mb-3"><i class="bi bi-person me-2 text-primary"></i>Patient Information</h6>
+                            <div class="small mb-2"><strong class="text-secondary">Name:</strong> {{ booking.patient.name }}</div>
+                            <div class="small mb-2"><strong class="text-secondary">Phone:</strong> {{ booking.patient.phone }}</div>
+                            <div class="small mb-2"><strong class="text-secondary">Email:</strong> {{ booking.patient.email }}</div>
+                            <div class="small mb-0"><strong class="text-secondary">Address:</strong> {{ booking.patient.address }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="bg-light p-3 rounded border h-100">
+                            <h6 class="fw-bold text-dark mb-3"><i class="bi bi-journal-check me-2 text-primary"></i>Appointment Schedule</h6>
+                            <div class="small mb-2"><strong class="text-secondary">Diagnostic Test:</strong> {{ booking.test.test_name }}</div>
+                            <div class="small mb-2"><strong class="text-secondary">Scheduled Date:</strong> {{ booking.booking_date }}</div>
+                            <div class="small mb-2"><strong class="text-secondary">Time Slot:</strong> {{ booking.booking_time|time:"h:i A" }}</div>
+                            <div class="small mb-0"><strong class="text-secondary">Total Fee:</strong> <span class="fw-bold text-success">₹{{ booking.total_cost }}</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if booking.notes %}
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-2"><i class="bi bi-sticky me-2"></i>Patient Notes</h6>
+                    <p class="small text-secondary bg-light p-3 rounded mb-0">{{ booking.notes }}</p>
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top flex-wrap gap-2">
+                    {% if user.is_staff %}
+                    <a href="{% url 'booking:admin_dashboard' %}" class="btn btn-outline-secondary">Back to Staff Dashboard</a>
+                    {% elif user.is_authenticated %}
+                    <a href="{% url 'booking:patient_dashboard' %}" class="btn btn-outline-secondary">Back to My Dashboard</a>
+                    {% else %}
+                    <a href="{% url 'booking:home' %}" class="btn btn-outline-secondary">Back to Home</a>
+                    {% endif %}
+
+                    {% if booking.can_cancel %}
+                    <a href="{% url 'booking:cancel_booking' booking.reference_number %}" class="btn btn-danger fw-semibold">
+                        <i class="bi bi-x-circle me-1"></i> Cancel Appointment
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
