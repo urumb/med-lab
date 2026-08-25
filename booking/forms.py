@@ -2,10 +2,54 @@
 Forms for the Medical Lab Booking System
 """
 from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import date, datetime
-from .models import Patient, Booking, Test
+from .models import Patient, Booking, Test, Category
+
+
+class PatientRegisterForm(UserCreationForm):
+    """Form for registering a new patient user account"""
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(max_length=50, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    age = forms.IntegerField(min_value=1, max_value=120, required=True, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    gender = forms.ChoiceField(choices=Patient.GENDER_CHOICES, required=True, widget=forms.Select(attrs={'class': 'form-control'}))
+    phone = forms.CharField(max_length=15, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+1234567890'}))
+    address = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}), required=True)
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            if 'class' not in field.widget.attrs:
+                field.widget.attrs['class'] = 'form-control'
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email').lower().strip()
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('A user with that email already exists.')
+        return email
+
+
+class PatientProfileForm(forms.ModelForm):
+    """Form for patients to update profile contact info"""
+    class Meta:
+        model = Patient
+        fields = ['name', 'age', 'gender', 'phone', 'email', 'address']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'age': forms.NumberInput(attrs={'class': 'form-control'}),
+            'gender': forms.Select(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
 
 
 class PatientForm(forms.ModelForm):
