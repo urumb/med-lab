@@ -265,6 +265,46 @@ class Booking(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
+    @classmethod
+    def get_available_time_slots(cls, test, booking_date):
+        """
+        Returns list of 30-min time slots ('08:00', '08:30', ...) with availability boolean status.
+        Excludes slots in the past if booking_date is today.
+        """
+        from datetime import datetime as dt, timedelta as td, time as tm
+        start_time = tm(8, 0)
+        end_time = tm(19, 30)
+
+        booked_times = set(
+            cls.objects.filter(
+                test=test,
+                booking_date=booking_date,
+                status__in=[cls.STATUS_PENDING, cls.STATUS_CONFIRMED, cls.STATUS_SAMPLE_COLLECTED, cls.STATUS_PROCESSING]
+            ).values_list('booking_time', flat=True)
+        )
+
+        slots = []
+        current_dt = dt.combine(booking_date, start_time)
+        end_dt = dt.combine(booking_date, end_time)
+        now = timezone.now()
+
+        while current_dt <= end_dt:
+            slot_time = current_dt.time()
+            is_past = (booking_date == date.today() and slot_time <= now.time())
+            is_booked = slot_time in booked_times
+            is_available = not is_past and not is_booked
+
+            slots.append({
+                'time': slot_time.strftime('%H:%M'),
+                'display': slot_time.strftime('%I:%M %p'),
+                'is_available': is_available,
+                'is_booked': is_booked,
+                'is_past': is_past
+            })
+            current_dt += td(minutes=30)
+
+        return slots
+
     @property
     def is_upcoming(self):
         """Check if the booking is upcoming"""

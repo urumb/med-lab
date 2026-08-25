@@ -39,12 +39,13 @@ def home(request):
 
 
 def test_catalog(request):
-    """Medical test catalog with search and category filtering"""
+    """Medical test catalog with search, category filtering, sorting, and pagination"""
     tests = Test.objects.filter(is_active=True).select_related('category')
     categories = Category.objects.all()
 
     category_slug = request.GET.get('category')
     search_query = request.GET.get('q')
+    sort_by = request.GET.get('sort', 'name_asc')
 
     if category_slug:
         tests = tests.filter(category__slug=category_slug)
@@ -55,7 +56,16 @@ def test_catalog(request):
             Q(code__icontains=search_query)
         )
 
-    paginator = Paginator(tests.order_by('test_name'), 9)
+    if sort_by == 'price_asc':
+        tests = tests.order_by('price')
+    elif sort_by == 'price_desc':
+        tests = tests.order_by('-price')
+    elif sort_by == 'name_desc':
+        tests = tests.order_by('-test_name')
+    else:
+        tests = tests.order_by('test_name')
+
+    paginator = Paginator(tests, 9)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -64,6 +74,7 @@ def test_catalog(request):
         'categories': categories,
         'selected_category': category_slug,
         'search_query': search_query,
+        'selected_sort': sort_by,
         'page_title': 'Test Catalog & Diagnostic Services',
     }
     return render(request, 'booking/test_catalog.html', context)
@@ -323,6 +334,74 @@ def booking_detail(request, reference_number):
         'booking': booking,
         'page_title': f'Booking Details - {booking.reference_number}',
     })
+
+
+def booking_receipt(request, reference_number):
+    """Printable / Downloadable receipt view for a booking"""
+    booking = get_object_or_404(Booking.objects.select_related('patient', 'test', 'test__category'), reference_number=reference_number)
+
+    if request.user.is_authenticated and not request.user.is_staff:
+        if hasattr(request.user, 'patient_profile') and booking.patient != request.user.patient_profile:
+            return HttpResponseForbidden("Access Denied: You cannot view this receipt.")
+
+    return render(request, 'booking/receipt.html', {
+        'booking': booking,
+        'page_title': f'Official Receipt - {booking.reference_number}',
+    })
+
+
+@user_passes_test(lambda u: u.is_staff)
+def export_bookings_csv(request):
+    """Export filtered bookings list as CSV file for lab staff"""
+    import csv
+    from django.http import HttpResponse
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="lab_bookings_{timezone.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'Reference Number', 'Patient Name', 'Patient Age', 'Gender', 'Phone', 'Email',
+        'Test Name', 'Test Code', 'Booking Date', 'Booking Time', 'Status', 'Price (INR)', 'Created At'
+    ])
+
+    bookings = Booking.objects.select_related('patient', 'test').order_by('-created_at')
+
+    # Apply same filters if passed
+    status_filter = request.GET.get('status')
+    date_filter = request.GET.get('date')
+    search_query = request.GET.get('search')
+
+    if status_filter:
+        bookings = bookings.filter(status=status_filter)
+    if date_filter:
+        bookings = bookings.filter(booking_date=date_filter)
+    if search_query:
+        bookings = bookings.filter(
+            Q(reference_number__icontains=search_query) |
+            Q(patient__name__icontains=search_query) |
+            Q(patient__phone__icontains=search_query) |
+            Q(test__test_name__icontains=search_query)
+        )
+
+    for b in bookings:
+        writer.writerow([
+            b.reference_number,
+            b.patient.name,
+            b.patient.age,
+            b.patient.get_gender_display(),
+            b.patient.phone,
+            b.patient.email,
+            b.test.test_name,
+            b.test.code or '',
+            b.booking_date,
+            b.booking_time.strftime('%H:%M'),
+            b.get_status_display(),
+            b.total_cost,
+            b.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        ])
+
+    return response
 
 
 def cancel_booking(request, reference_number):
