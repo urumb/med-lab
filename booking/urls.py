@@ -26,7 +26,9 @@ urlpatterns = [
     path('book/<int:test_id>/', views.book_test, name='book_specific_test'),
     path('success/<str:reference_number>/', views.booking_success, name='booking_success'),
     path('booking/<str:reference_number>/', views.booking_detail, name='booking_detail'),
+    path('booking/<str:reference_number>/receipt/', views.booking_receipt, name='booking_receipt'),
     path('booking/<str:reference_number>/cancel/', views.cancel_booking, name='cancel_booking'),
+    path('admin-dashboard/export-csv/', views.export_bookings_csv, name='export_bookings_csv'),
     path('my-bookings/', views.my_bookings, name='my_bookings'),
 
     # Admin Management Dashboard

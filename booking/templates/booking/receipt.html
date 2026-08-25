@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Official Receipt - {{ booking.reference_number }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #1e293b;
+        }
+        .receipt-card {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #fff;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        @media print {
+            body { background: #fff; }
+            .receipt-card { box-shadow: none; border: none; margin: 0; padding: 0; max-width: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="receipt-card">
+            <!-- Action Bar -->
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom no-print">
+                <a href="{% url 'booking:booking_detail' booking.reference_number %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Booking
+                </a>
+                <button onclick="window.print()" class="btn btn-primary btn-sm fw-bold">
+                    <i class="bi bi-printer me-1"></i> Print / Save PDF Receipt
+                </button>
+            </div>
+
+            <!-- Receipt Header -->
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h3 class="fw-bold text-primary mb-1"><i class="bi bi-heart-pulse-fill me-2"></i>MedLab Diagnostics</h3>
+                    <p class="text-muted small mb-0">ISO 15189 Certified Clinical Diagnostics</p>
+                    <p class="text-muted small mb-0">123 Health Diagnostic Way, Suite 100</p>
+                    <p class="text-muted small mb-0">Phone: +1 (800) 555-0199 | Email: info@medlab.org</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-success-subtle text-success border border-success-subtle fs-6 px-3 py-2 mb-2">OFFICIAL RECEIPT</span>
+                    <h5 class="font-monospace fw-bold text-dark mb-0">{{ booking.reference_number }}</h5>
+                    <small class="text-muted">Issued: {% now "M d, Y" %}</small>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Patient & Schedule Info -->
+            <div class="row g-4 mb-4">
+                <div class="col-6">
+                    <h6 class="text-muted small fw-bold text-uppercase mb-2">PATIENT DETAILS</h6>
+                    <p class="fw-bold mb-1 text-dark">{{ booking.patient.name }}</p>
+                    <p class="small text-muted mb-1">Age / Gender: {{ booking.patient.age }} Yrs / {{ booking.patient.get_gender_display }}</p>
+                    <p class="small text-muted mb-1">Phone: {{ booking.patient.phone }}</p>
+                    <p class="small text-muted mb-0">Email: {{ booking.patient.email }}</p>
+                </div>
+                <div class="col-6 text-end">
+                    <h6 class="text-muted small fw-bold text-uppercase mb-2">APPOINTMENT SCHEDULE</h6>
+                    <p class="fw-bold mb-1 text-dark">{{ booking.booking_date }}</p>
+                    <p class="small text-muted mb-1">Time Slot: {{ booking.booking_time|time:"h:i A" }}</p>
+                    <p class="small text-muted mb-1">Status: <strong class="text-primary">{{ booking.get_status_display }}</strong></p>
+                    <p class="small text-muted mb-0">Location: Central Lab Facility</p>
+                </div>
+            </div>
+
+            <!-- Itemized Fee Table -->
+            <table class="table table-bordered mb-4">
+                <thead class="table-light">
+                    <tr>
+                        <th>Item & Description</th>
+                        <th>Code</th>
+                        <th>Turnaround</th>
+                        <th class="text-end">Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong class="text-dark d-block">{{ booking.test.test_name }}</strong>
+                            <span class="small text-muted">{{ booking.test.category.name|default:"Diagnostic Test" }}</span>
+                        </td>
+                        <td class="font-monospace small">{{ booking.test.code|default:"N/A" }}</td>
+                        <td class="small">{{ booking.test.turnaround_time }}</td>
+                        <td class="text-end fw-bold">₹{{ booking.total_cost }}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end fw-bold">TOTAL AMOUNT PAID:</td>
+                        <td class="text-end fw-bold text-success fs-5">₹{{ booking.total_cost }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            {% if booking.test.preparation_instructions %}
+            <div class="bg-light p-3 rounded mb-4 border">
+                <h6 class="fw-bold text-dark small mb-1"><i class="bi bi-info-circle me-1"></i> Patient Guidelines:</h6>
+                <p class="small text-secondary mb-0">{{ booking.test.preparation_instructions }}</p>
+            </div>
+            {% endif %}
+
+            <div class="text-center pt-3 border-top text-muted small">
+                <p class="mb-1">Thank you for choosing MedLab Diagnostics for your healthcare services.</p>
+                <p class="mb-0">This is a computer-generated official receipt. No signature required.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
