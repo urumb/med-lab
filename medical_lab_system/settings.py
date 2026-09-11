@@ -6,15 +6,25 @@ from pathlib import Path
 import os
 import dj_database_url
 from decouple import config, Csv
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='med-lab-production-secure-key-983021948201948201948201948201948201')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# In production (DEBUG=False) the SECRET_KEY must always come from the
+# environment; there is no insecure hardcoded fallback for that case.
+SECRET_KEY = config('SECRET_KEY', default=None)
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'django-insecure-local-development-only-key'
+    else:
+        raise ImproperlyConfigured(
+            'The SECRET_KEY environment variable must be set when DEBUG=False.'
+        )
 
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS',
@@ -153,9 +163,9 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
-SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
-CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=not DEBUG, cast=bool)
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=not DEBUG, cast=bool)
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=not DEBUG, cast=bool)
 
 if not DEBUG and SECURE_SSL_REDIRECT:
     SECURE_HSTS_SECONDS = 31536000  # 1 year
